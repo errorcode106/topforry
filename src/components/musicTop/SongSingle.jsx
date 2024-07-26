@@ -1,18 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+function SongCard({ song }) {
+    
+    const backgroundClassName = "has-background-" 
 
-function Inicio() {
-    const navigate = useNavigate();
-    const handleLoginClick = () => {
-        navigate('/login');
-    };
+    let textClassName = "has-text-";
 
-    const backgroundClassName = "has-background-light"; 
-    const className = backgroundClassName;
-    const textClassName = "has-text-dark"; 
-    const song = {
-        title: "Nobody",
-    };
-
+    const className = backgroundClassName + " " + textClassName;
     return (
         <div className={`card ${className}`}>
             <div className="card-content">
@@ -25,7 +17,7 @@ function Inicio() {
                 </div>
                 <div className="content">
                     <audio controls>
-                        <source src="https://sandbox.academiadevelopers.com/media/harmonyhub/songs/OneRepublic_-_Nobody_from_Kaiju_No_8__BaseNaija_q8IOY6P.mp3" type="audio/mpeg" />
+                        <source src={song.song_file} type="audio/mpeg" />
                         Tu navegador no soporta el elemento de audio.
                     </audio>
                 </div>
@@ -34,4 +26,4 @@ function Inicio() {
     );
 }
 
-export default Inicio;
+export default SongCard;
