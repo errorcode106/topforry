@@ -3,6 +3,7 @@ import Login from "../components/Login";
 import Layout from "./Layout";
 import Inicio from "../components/Inicio";
 import Listado from "../components/Listado";
+import ProtectedRoute from "./ProtectedRoute"; 
 
 const Router = createBrowserRouter([
     {
@@ -14,17 +15,14 @@ const Router = createBrowserRouter([
             },
             {
                 index: true, // path: "/"
-                element: (
-                    
-                        <Inicio />
-                ),
+                element: <Inicio />,
             },
             {
                 path: "/listado",
                 element: (
-                    
+                    <ProtectedRoute>
                         <Listado />
-                   
+                    </ProtectedRoute>
                 ),
             },
         ],

@@ -1,25 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useFetch from "../hooks/useFetch";
+import { useAuth } from "../contexts/AuthContext";
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [triggerFetch, setTriggerFetch] = useState(false);
 
-    const { data, isError, isLoading } = useFetch(
-        "https://sandbox.academiadevelopers.com/api-auth/",
-        {
+    const [{ data, isError, isLoading }, doFetch] = useFetch(
+        "https://sandbox.academiadevelopers.com/api-auth/"
+    );
+
+    const { login } = useAuth("actions");
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        doFetch({
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ username, password }),
-        },
-        triggerFetch
-    );
-
-    function handleSubmit(event) {
-        event.preventDefault();
+        });
         setTriggerFetch(true);
     }
 
@@ -28,6 +30,13 @@ function Login() {
         if (name === "username") setUsername(value);
         if (name === "password") setPassword(value);
     }
+
+    useEffect(() => {
+        if (data && !isError && triggerFetch) {
+            login(data.token);
+            setTriggerFetch(false);
+        }
+    }, [data, isError, triggerFetch, login]);
 
     return (
         <section className="section">
