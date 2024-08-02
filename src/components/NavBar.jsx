@@ -28,6 +28,7 @@ function NavBar({ appName }) {
                     items={[
                         { text: "Top Inicio", url: "/" },
                         { text: "Listado de Canciones", url: "/listado" },
+                        { text: "Perfil", url: "/Profile" },
                         { text: "Inicio de Sesion", url: "/login" },
                     ]}
                 />
