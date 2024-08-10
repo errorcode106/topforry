@@ -7,14 +7,14 @@ const Header = ({ isLoggedIn, onLogout }) => {
   const navItems = [
     { text: 'Inicio', href: '/' },
     {
-      text: 'Recursos',
+      text: 'Canciones',
       dropdown: true,
       requiresAuth: true,
       dropdownItems: [
-        { text: 'Álbumes', href: '/albunes' },
-        { text: 'Canciones', href: '#' },
-        { text: 'Artistas', href: '#' },
-        { text: 'Géneros', href: '#' },
+        { text: "Escuchar Canción", url: "/canciones/list" },
+        { text: "Subir Canción", url: "/canciones/create" },
+        { text: "Modificar Canción", url: "/canciones/update" },
+        { text: "Borrar Canción", url: "/canciones/delete" },
       ],
     },
   ];
@@ -42,8 +42,8 @@ const Header = ({ isLoggedIn, onLogout }) => {
       <div className="overlay-header"></div>
       <div className="container-fluid d-flex justify-content-center align-items-center h-100">
         <div className="masthead-text">
-          <h1>Álbumes</h1>
-          <p className="fs-4">Aquí encontrarás la lista de todos los álbumes.</p>
+         
+          
         </div>
       </div>
     </header>

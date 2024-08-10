@@ -6,6 +6,11 @@ import Albums from "../pages/Albums";
 import ProtectedRoute from "./ProtectedRoute"; 
 import Profile from "../pages/Profile";
 
+import SongCreateForm from "../components/musicTop/SongCreateForm";
+import SongsList from "../components/musicTop/SongsList";
+import SongUpdate from "../components/musicTop/SongUpdate";
+import SongDelete from "../components/musicTop/SongDelete";
+
 const Router = createBrowserRouter([
     {
         element: <Layout />,
@@ -31,6 +36,38 @@ const Router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <Profile />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/canciones/list",
+                element: (
+                    <ProtectedRoute>
+                        <SongsList />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/canciones/create",
+                element: (
+                    <ProtectedRoute>
+                        <SongCreateForm />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/canciones/update",
+                element: (
+                    <ProtectedRoute>
+                        <SongUpdate />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/canciones/delete",
+                element: (
+                    <ProtectedRoute>
+                        <SongDelete />
                     </ProtectedRoute>
                 ),
             },

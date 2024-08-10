@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from 'react-router-dom'; // Importa Link
 import { AuthContext } from '../contexts/AuthContext';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Navbar = ({ logoSrc, logoAlt, navItems, buttonLinks }) => {
   const { state, actions } = useContext(AuthContext);
@@ -41,9 +43,9 @@ const Navbar = ({ logoSrc, logoAlt, navItems, buttonLinks }) => {
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+        <Link className="navbar-brand" to="#">
           <img src={logoSrc} alt={logoAlt} height="32" />
-        </a>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -61,27 +63,29 @@ const Navbar = ({ logoSrc, logoAlt, navItems, buttonLinks }) => {
               item.requiresAuth && !isAuthenticated ? null : (
                 item.dropdown ? (
                   <li key={index} className="nav-item dropdown">
-                    <a
+                    <Link
                       className="nav-link dropdown-toggle text-light"
-                      href="#"
+                      to="#"
                       id={`navbarDropdown${index}`}
                       role="button"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
                       {item.text}
-                    </a>
+                    </Link>
                     <ul className="dropdown-menu" aria-labelledby={`navbarDropdown${index}`}>
                       {item.dropdownItems.map((dropdownItem, idx) => (
                         <li key={idx}>
-                          <a className="dropdown-item" href={dropdownItem.href}>{dropdownItem.text}</a>
+                          <Link className="dropdown-item" to={dropdownItem.url}>
+                            {dropdownItem.text}
+                          </Link>
                         </li>
                       ))}
                     </ul>
                   </li>
                 ) : (
                   <li key={index} className="nav-item">
-                    <a className="nav-link text-light" href={item.href}>{item.text}</a>
+                    <Link className="nav-link text-light" to={item.href}>{item.text}</Link>
                   </li>
                 )
               )
@@ -91,24 +95,23 @@ const Navbar = ({ logoSrc, logoAlt, navItems, buttonLinks }) => {
             {buttonLinks.map((button, index) => (
               button.requiresAuth && !isAuthenticated ? null : (
                 <li key={index} className="nav-item">
-                  <a
+                  <Link
                     className={`btn ${button.className} me-2`}
-                    href={button.href}
+                    to={button.href}
                     onClick={button.onClick}
                   >
                     {button.text}
-                  </a>
+                  </Link>
                 </li>
               )
             ))}
             <li className="nav-item">
-              <a
+              <button
                 className="btn btn-danger"
-                href="#"
                 onClick={isAuthenticated ? handleLogout : handleLogin}
               >
                 {isAuthenticated ? "Cerrar Sesión" : "Iniciar Sesión"}
-              </a>
+              </button>
             </li>
           </ul>
         </div>
