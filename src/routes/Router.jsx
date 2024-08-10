@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from "../components/Login";
+import Login from "../pages/Login";
 import Layout from "./Layout";
-import Inicio from "../components/Inicio";
-import Listado from "../components/Listado";
+import Home from "../pages/Home";
+import Albums from "../pages/Albums";
 import ProtectedRoute from "./ProtectedRoute"; 
-import Profile from "../components/Profile";
+import Profile from "../pages/Profile";
 
 const Router = createBrowserRouter([
     {
@@ -16,13 +16,13 @@ const Router = createBrowserRouter([
             },
             {
                 index: true, // path: "/"
-                element: <Inicio />,
+                element: <Home />,
             },
             {
                 path: "/listado",
                 element: (
                     <ProtectedRoute>
-                        <Listado />
+                        <Albums />
                     </ProtectedRoute>
                 ),
             },
