@@ -1,0 +1,7 @@
+.footer .social-icons a {
+    transition: color 0.3s;
+}
+
+.footer .social-icons a:hover {
+    color: #ffdd57;
+}
