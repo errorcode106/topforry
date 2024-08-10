@@ -19,7 +19,7 @@ const Router = createBrowserRouter([
                 element: <Home />,
             },
             {
-                path: "/listado",
+                path: "/albums",
                 element: (
                     <ProtectedRoute>
                         <Albums />
