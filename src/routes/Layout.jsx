@@ -18,7 +18,7 @@ export default function Layout() {
                         { text: 'Artistas', href: '/artists' },
                         { text: 'Géneros', href: '/genres' },
                         { text: 'Listas de Reproducción', href: '/playlists' },
-                        { text: 'API', href: '/api' },
+                        { text: 'API', href: 'https://sandbox.academiadevelopers.com/docs/' },
                     ]}
                     languages={[
                         { value: 'es', label: 'Español (AR)' },
