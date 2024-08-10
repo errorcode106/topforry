@@ -5,7 +5,7 @@ import Home from "../pages/Home";
 import Albums from "../pages/Albums";
 import ProtectedRoute from "./ProtectedRoute"; 
 import Profile from "../pages/Profile";
-
+import SongCreateForm from "../pages/SongCreateForm";
 const Router = createBrowserRouter([
     {
         element: <Layout />,
@@ -31,6 +31,14 @@ const Router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <Profile />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/Canciones",
+                element: (
+                    <ProtectedRoute>
+                        <SongCreateForm />
                     </ProtectedRoute>
                 ),
             },

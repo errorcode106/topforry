@@ -27,6 +27,7 @@ function NavBar({ appName }) {
                 <NavMenu
                     items={[
                         { text: "Top Inicio", url: "/" },
+                        { text: "Canciones", url: "/canciones" },
                         { text: "Listado de Canciones", url: "/listado" },
                         { text: "Perfil", url: "/Profile" },
                         { text: "Inicio de Sesion", url: "/login" },
