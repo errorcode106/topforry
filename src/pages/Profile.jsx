@@ -4,7 +4,7 @@ export default function Profile() {
             <h2 className="title">Top Profile...</h2>
             <p>
                 Tu perfil, si logeaste correctamente,
-                <h2>Desbloqueaste el perfil xD</h2>
+                <h2>NOOOOOOOOOOOOOOOOO xD</h2>
             </p>
             
         

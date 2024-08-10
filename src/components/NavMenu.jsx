@@ -5,13 +5,20 @@ function NavMenu({ items }) {
         <div className="navbar-menu">
             <div className="navbar-start">
                 {items.map((item, index) => (
-                    <Link
-                        key={index}
-                        className={"navbar-item "}
-                        to={item.url}
-                    >
-                        {item.text}
-                    </Link>
+                    <div key={index} className="navbar-item has-dropdown is-hoverable">
+                        <Link className="navbar-link text-decoration-none" to={item.url}>
+                            {item.text}
+                        </Link>
+                        {item.submenu && (
+                            <div className="navbar-dropdown">
+                                {item.submenu.map((subitem, subindex) => (
+                                    <Link key={subindex} className="navbar-item text-decoration-none" to={subitem.url}>
+                                        {subitem.text}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
         </div>
