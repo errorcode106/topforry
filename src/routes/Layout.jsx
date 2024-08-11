@@ -1,14 +1,45 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { AuthProvider } from "../contexts/AuthContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export default function Layout() {
+    const location = useLocation();
+
+    const headerConfig = {
+        '/': {
+            title: "PLAY & SHARE MUSIC WITH MOOD COMMUNITY",
+            subtitle: "Connect with people and enjoy music together",
+            backgroundClass: "home"
+        },
+        '/albums': {
+            title: "Álbumes",
+            subtitle: "Aquí encontrarás la lista de todos los álbumes.",
+            backgroundClass: "albums"
+        },
+        '/profile': {
+            title: "Perfil",
+            subtitle: "Aquí puedes ver y editar tu perfil.",
+            backgroundClass: "profile"
+        },
+        '/login': {
+            title: "Iniciar Sesión",
+            subtitle: "Accede a tu cuenta para continuar.",
+            backgroundClass: "login"
+        }
+    };
+
+    const headerProps = headerConfig[location.pathname] || {
+        title: "Bienvenido",
+        subtitle: "Explora nuestra plataforma",
+        backgroundClass: "default"
+    };
+
     return (
         <AuthProvider>
             <div className={`hero is-fullheight is-flex is-flex-direction-column`}>
-                <Header />
-                <div className={`container flex-grow-1`}>
+                <Header {...headerProps} />
+                <div className={`container-fluid`}>
                     <Outlet />
                 </div>
                 <Footer

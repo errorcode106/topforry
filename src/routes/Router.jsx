@@ -3,8 +3,10 @@ import Login from "../pages/Login";
 import Layout from "./Layout";
 import Home from "../pages/Home";
 import Albums from "../pages/Albums";
+import Album from "../pages/Album";
 import ProtectedRoute from "./ProtectedRoute"; 
 import Profile from "../pages/Profile";
+import ErrorPage from "../pages/ErrorPage";
 
 import SongCreateForm from "../components/musicTop/SongCreateForm";
 import SongsList from "../components/musicTop/SongsList";
@@ -14,13 +16,15 @@ import SongDelete from "../components/musicTop/SongDelete";
 const Router = createBrowserRouter([
     {
         element: <Layout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: "/login",
                 element: <Login />,
             },
             {
-                index: true, // path: "/"
+                index: true, 
+                path: "/",
                 element: <Home />,
             },
             {
@@ -28,6 +32,14 @@ const Router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <Albums />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/album/:id",
+                element: (
+                    <ProtectedRoute>
+                        <Album />
                     </ProtectedRoute>
                 ),
             },

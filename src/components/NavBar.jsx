@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom'; // Importa Link
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -106,12 +106,13 @@ const Navbar = ({ logoSrc, logoAlt, navItems, buttonLinks }) => {
               )
             ))}
             <li className="nav-item">
-              <button
-                className="btn btn-danger"
+              <a
+                className={`btn ${isAuthenticated ? 'btn-danger':'btn-success'}`}
+                href="#"
                 onClick={isAuthenticated ? handleLogout : handleLogin}
-              >
+                >
                 {isAuthenticated ? "Cerrar Sesión" : "Iniciar Sesión"}
-              </button>
+              </a>
             </li>
           </ul>
         </div>
