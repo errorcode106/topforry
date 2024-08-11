@@ -28,7 +28,7 @@ function SongDelete() {
             ...filters,
         }).toString();
 
-        fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/songs/?${query}`)
+        fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/?${query}`)
             .then((response) => response.json())
             .then((data) => {
                 if (data.results && data.results.length > 0) {
@@ -89,12 +89,12 @@ function SongDelete() {
     const handleDeleteSong = (song) => {
         setSelectedSong(song);
         setShowModal(true);
-        console.log('Showing modal:', song); // Verifica en la consola
+        console.log('Showing modal:', song); 
     };
 
     const confirmDelete = () => {
         fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/harmonyhub/songs/${selectedSong.id}/`,
+            `https://sandbox.academiadevelopers.com/harmonyhub/songs/${selectedSong.id}/`,
             {
                 method: "DELETE",
                 headers: {

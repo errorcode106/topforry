@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 export default function SongCreateForm() {
     const [songData, setSongData] = useState({ title: "" });
     const [successMessage, setSuccessMessage] = useState("");
-    const fileInputRef = useRef(null); // Crear un ref para el input de archivo
+    const fileInputRef = useRef(null); 
 
     function handleInputChange(event) {
         const { name, value } = event.target;
@@ -14,8 +14,7 @@ export default function SongCreateForm() {
     }
 
     function handleFileChange(event) {
-        // Aquí no es necesario mantener el archivo en un estado
-        // ya que lo manejamos directamente con FormData en el submit
+        
     }
 
     function handleSubmit(event) {
@@ -31,7 +30,7 @@ export default function SongCreateForm() {
         const formData = new FormData();
         formData.append("title", songData.title);
 
-        const file = fileInputRef.current.files[0]; // Obtener el archivo del input directamente
+        const file = fileInputRef.current.files[0]; 
         if (file) {
             formData.append("song_file", file);
         } else {
@@ -39,7 +38,8 @@ export default function SongCreateForm() {
             return;
         }
 
-        fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/songs/`, {
+
+        fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/`, {
             method: "POST",
             headers: {
                 Authorization: `Token ${token}`,
@@ -53,12 +53,10 @@ export default function SongCreateForm() {
             return response.json();
         })
         .then(data => {
-            console.log(data);
-            // Mostrar mensaje de éxito
+            console.log(data);     
             setSuccessMessage("Canción cargada con éxito.");
-            // Resetear el formulario
             setSongData({ title: "" });
-            fileInputRef.current.value = ""; // Resetear el input de archivo
+            fileInputRef.current.value = ""; 
         })
         .catch(error => console.error('Error:', error));
     }
@@ -89,7 +87,7 @@ export default function SongCreateForm() {
                     <input 
                         className="form-control" 
                         type="file"
-                        ref={fileInputRef} // Asignar el ref al input
+                        ref={fileInputRef} 
                         onChange={handleFileChange}
                     />
                 </div>
