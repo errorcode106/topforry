@@ -1,0 +1,60 @@
+.music-card {
+  overflow: hidden;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.music-card:hover {
+  transform: scale(1.05);
+}
+
+.card-img-wrapper {
+  position: relative;
+}
+
+.card-img-wrapper img {
+  width: 100%;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: -webkit-linear-gradient(top, transparent 0%, #4743d8 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.music-card:hover .overlay {
+  opacity: 1;
+}
+
+.play-button {
+  color: white;
+  font-size: 2rem;
+}
+
+.play-button i {
+  pointer-events: none;
+}
+
+.card-body {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.music-card:hover {
+  background-color: rgba(71, 67, 216, 1);
+  transition: background-color 0.2s, color 0.3s;
+  color: white !important;
+}
+
