@@ -7,14 +7,14 @@ const Header = ({ isLoggedIn, onLogout, title, subtitle, backgroundClass }) => {
   const navItems = [
     { text: 'Inicio', href: '/' },
     {
-      text: 'Recursos',
+      text: 'Canciones',
       dropdown: true,
       requiresAuth: true,
       dropdownItems: [
-        { text: 'Álbumes', href: '/albums' },
-        { text: 'Canciones', href: '/songs' },
-        { text: 'Artistas', href: '#' },
-        { text: 'Géneros', href: '#' },
+        { text: "Escuchar Canción", url: "/canciones/list" },
+        { text: "Subir Canción", url: "/canciones/create" },
+        { text: "Modificar Canción", url: "/canciones/update" },
+        { text: "Borrar Canción", url: "/canciones/delete" },
       ],
     },
   ];
