@@ -22,8 +22,8 @@ const Header = ({ isLoggedIn, onLogout, title, subtitle, backgroundClass }) => {
       dropdown: true,
       requiresAuth: true,
       dropdownItems: [
-        { text: 'Ver Listado', href: '/albums' },
-        { text: 'Crear uno Nuevo', href: '/albums/new' },
+        { text: 'Ver Listado', url: '/albums' },
+        { text: 'Crear uno Nuevo', url: '/albums/new' },
       ],
     },
   ];

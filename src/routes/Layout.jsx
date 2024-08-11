@@ -44,12 +44,12 @@ export default function Layout() {
                 </div>
                 <Footer
                     menuItems={[
-                        { text: 'Álbumes', href: '/albums' },
-                        { text: 'Canciones', href: '/songs' },
-                        { text: 'Artistas', href: '/artists' },
-                        { text: 'Géneros', href: '/genres' },
-                        { text: 'Listas de Reproducción', href: '/playlists' },
-                        { text: 'API', href: 'https://sandbox.academiadevelopers.com/docs/' },
+                        { text: 'Álbumes', url: '/albums' },
+                        { text: 'Canciones', url: '/songs' },
+                        { text: 'Artistas', url: '/artists' },
+                        { text: 'Géneros', url: '/genres' },
+                        { text: 'Listas de Reproducción', url: '/playlists' },
+                        { text: 'API', url: 'https://sandbox.academiadevelopers.com/docs/' },
                     ]}
                     languages={[
                         { value: 'es', label: 'Español (AR)' },
@@ -61,11 +61,11 @@ export default function Layout() {
                     siteName="Top Forry"
                     tagline="Sigue tu música!"
                     socialLinks={[
-                        { href: '#', icon: 'faTwitter' },
-                        { href: '#', icon: 'faFacebook' },
-                        { href: '#', icon: 'faReddit' },
-                        { href: '#', icon: 'faInstagram' },
-                        { href: '#', icon: 'faYoutube' },
+                        { url: '#', icon: 'faTwitter' },
+                        { url: '#', icon: 'faFacebook' },
+                        { url: '#', icon: 'faReddit' },
+                        { url: '#', icon: 'faInstagram' },
+                        { url: '#', icon: 'faYoutube' },
                     ]}
                     year="2024"
                     copyrightText="Todas las marcas comerciales a las que se hace referencia son propiedad de sus respectivos dueños."
