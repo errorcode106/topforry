@@ -2,140 +2,359 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button, Form } from 'react-bootstrap';
+import AudioPlayer from '../components/AudioPlayer';
 
 const AlbumDetail = () => {
-  const { id } = useParams();
-  const [albumData, setAlbumData] = useState(null);
-  const [songs, setSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [playing, setPlaying] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const { id } = useParams();
+    const [albumData, setAlbumData] = useState(null);
+    const [songs, setSongs] = useState([]);
+    const [currentSong, setCurrentSong] = useState(null);
+    const [playing, setPlaying] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [editing, setEditing] = useState(false);
+    const [authUser, setAuthUser] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [songToDelete, setSongToDelete] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editedSong, setEditedSong] = useState(null);
 
-  useEffect(() => {
-    const fetchAlbumData = async () => {
-      try {
-        const authToken = localStorage.getItem('authToken');
+    useEffect(() => {
+        const fetchAlbumData = async () => {
+            try {
+                const authToken = localStorage.getItem('authToken');
 
-        const albumResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${id}/`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${authToken}`,
-          },
-        });
+                // Fetch user info
+                const userResponse = await fetch(`https://sandbox.academiadevelopers.com/users/profiles/profile_data/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${authToken}`,
+                    },
+                });
 
-        if (!albumResponse.ok) {
-          throw new Error('Error al obtener los datos del álbum.');
-        }
+                const userData = await userResponse.json();
+                setAuthUser(userData.user__id);
 
-        const album = await albumResponse.json();
-        setAlbumData(album);
+                // Fetch album data
+                const albumResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${id}/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${authToken}`,
+                    },
+                });
 
-        const songsResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/?album=${id}`, {
-          headers: {
-            'Authorization': `Token ${authToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
+                if (!albumResponse.ok) {
+                    throw new Error('Error al obtener los datos del álbum.');
+                }
 
-        if (!songsResponse.ok) {
-          throw new Error('Error al obtener las canciones del álbum.');
-        }
+                const album = await albumResponse.json();
+                setAlbumData(album);
 
-        const songsData = await songsResponse.json();
-        setSongs(songsData.results);
-        setCurrentSong(songsData.results[0]); // Iniciar con la primera canción seleccionada
+                const songsResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/?album=${id}`, {
+                    headers: {
+                        'Authorization': `Token ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
+                if (!songsResponse.ok) {
+                    throw new Error('Error al obtener las canciones del álbum.');
+                }
+
+                const songsData = await songsResponse.json();
+                setSongs(songsData.results);
+                setCurrentSong(songsData.results[0] || null); // Iniciar con la primera canción seleccionada o null si no hay canciones
+
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        fetchAlbumData();
+    }, [id]);
+
+    const handleSongClick = (song) => {
+        setCurrentSong(song);
+        setPlaying(false);  // Parar la reproducción actual
+        setTimeout(() => setPlaying(true), 100);  // Iniciar la reproducción de la nueva canción
     };
 
-    fetchAlbumData();
-  }, [id]);
+    const handleEditAlbum = () => {
+        setEditing(!editing);
+    };
 
-  const handleSongClick = (song) => {
-    if (currentSong && currentSong.id === song.id && playing) {
-      setPlaying(false);
-    } else {
-      setCurrentSong(song);
-      setPlaying(true);
-    }
-  };
+    const handleSaveAlbumChanges = async () => {
+        const authToken = localStorage.getItem('authToken');
+        const formData = new FormData();
+        formData.append('title', albumData.title);
+        formData.append('year', albumData.year);
+        formData.append('artist', albumData.artist);
+        if (albumData.cover instanceof File) {
+            formData.append('cover', albumData.cover);
+        }
 
-  useEffect(() => {
-    const audioPlayer = document.getElementById('audio-player');
-    if (audioPlayer) {
-      if (playing && currentSong && currentSong.song_file) {
-        audioPlayer.play();
-      } else {
-        audioPlayer.pause();
-      }
-    }
-  }, [playing, currentSong]);
+        try {
+            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${albumData.id}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                },
+                body: formData,
+            });
 
-  if (loading) {
-    return <div className="text-center mt-5">Cargando álbum...</div>;
-  }
+            if (!response.ok) {
+                throw new Error('Error al actualizar el álbum.');
+            }
 
-  if (error) {
-    return <div className="alert alert-danger mt-5 text-center">{error}</div>;
-  }
+            const updatedAlbum = await response.json();
+            setAlbumData(updatedAlbum);
+            setEditing(false);
+        } catch (err) {
+            console.error('Error al actualizar el álbum:', err);
+        }
+    };
 
-  return (
-    <div className="container my-5">
-      <div className="row">
-        <div className="col-md-4">
-          <img src={albumData.cover} alt={albumData.title} className="img-fluid rounded mb-4" />
-          <div>
-            <p><strong>Año:</strong> {albumData.year}</p>
-            <p><strong>ID del Artista:</strong> {albumData.artist}</p>
-            <p><strong>Propietario:</strong> {albumData.owner}</p>
-          </div>
-        </div>
-        <div className="col-md-8">
-          <h2>{albumData.title} <span className="text-muted">#{albumData.id}</span></h2>
-          <div className="mt-4 mb-4">
-            {currentSong && (
-              <div>
-                <h4>Reproduciendo: {currentSong.title}</h4>
-                <audio id="audio-player" controls src={currentSong.song_file} className="w-100">
-                  Tu navegador no soporta el elemento de audio.
-                </audio>
-                <p>Duración: {currentSong.duration ? `${currentSong.duration} segundos` : 'No especificada'}</p>
-                <p>Vistas: {currentSong.view_count}</p>
-              </div>
-            )}
-          </div>
-          <h4>Canciones</h4>
-          <ul className="list-group">
-            {songs.map((song, index) => (
-              <li
-                key={song.id}
-                className={`list-group-item d-flex justify-content-between align-items-center ${currentSong && currentSong.id === song.id ? 'active' : ''}`}
-                onClick={() => handleSongClick(song)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="d-flex align-items-center">
-                  <FontAwesomeIcon
-                    icon={currentSong && currentSong.id === song.id && playing ? faPause : faPlay}
-                    className="me-3"
-                    style={{ color: currentSong && currentSong.id === song.id ? '#007bff' : '#6c757d' }}
-                  />
-                  <span>{index + 1}. </span>
-                  <strong className="ms-2">{song.title}</strong>
+    const handleDeleteSong = (songId) => {
+        setSongToDelete(songId);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteSong = async () => {
+        const authToken = localStorage.getItem('authToken');
+
+        try {
+            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${songToDelete}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setSongs(songs.filter(song => song.id !== songToDelete));
+                setShowDeleteModal(false);
+            } else {
+                console.error('Error al eliminar la canción:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error al eliminar la canción:', error);
+        }
+    };
+
+    const handleEditSong = (song) => {
+        setEditedSong(song);
+        setShowEditModal(true);
+    };
+
+    const handleSaveSongChanges = async () => {
+        const authToken = localStorage.getItem('authToken');
+        const formData = new FormData();
+        formData.append('title', editedSong.title);
+        formData.append('year', editedSong.year);
+
+        try {
+            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${editedSong.id}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar la canción.');
+            }
+
+            const updatedSong = await response.json();
+            setSongs(songs.map(song => song.id === updatedSong.id ? updatedSong : song));
+            setShowEditModal(false);
+        } catch (err) {
+            console.error('Error al actualizar la canción:', err);
+        }
+    };
+
+    useEffect(() => {
+        const audioPlayer = document.getElementById('audio-player');
+        if (audioPlayer) {
+            if (playing && currentSong && currentSong.song_file) {
+                audioPlayer.currentTime = 0;  // Reinicia la canción
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+    }, [playing, currentSong]);
+
+    if (loading) {
+        return (
+            <div className="modal show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-body d-flex justify-content-center align-items-center">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <span className="text-muted">{song.duration ? `${song.duration} s` : 'No especificada'}</span>
-              </li>
-            ))}
-          </ul>
+            </div>
+        );
+    }
+    if (error) {
+        return <div className="alert alert-danger mt-5 text-center">{error}</div>;
+    }
+
+    return (
+        <div className="container my-5">
+            <div className="row">
+                <div className="col-md-4">
+                    <AudioPlayer
+                        songFile={currentSong?.song_file || null}  // Asegurarse de pasar null si no hay canción
+                        coverImage={albumData.cover}
+                        title={currentSong?.title || 'No song selected'}
+                        artist={albumData.artist}
+                        playing={playing}
+                        setPlaying={setPlaying}
+                    />
+                </div>
+                <div className="col-md-8">
+                    <div className="d-flex align-items-center">
+                        {editing ? (
+                            <>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={albumData.title}
+                                    onChange={(e) => setAlbumData({ ...albumData, title: e.target.value })}
+                                />
+                                <input
+                                    type="number"
+                                    className="form-control ms-2"
+                                    value={albumData.year}
+                                    onChange={(e) => setAlbumData({ ...albumData, year: e.target.value })}
+                                />
+                                <input
+                                    type="file"
+                                    className="form-control ms-2"
+                                    onChange={(e) => setAlbumData({ ...albumData, cover: e.target.files[0] })}
+                                />
+                                <Button className="ms-2" onClick={handleSaveAlbumChanges}>Guardar</Button>
+                            </>
+                        ) : (
+                            <>
+                                <h2>{albumData.title} <span className="text-muted">#{albumData.year}:{albumData.owner}</span></h2>
+                                {authUser === albumData.owner && (
+                                    <FontAwesomeIcon
+                                        icon={faPen}
+                                        className="ms-auto"
+                                        style={{ cursor: 'pointer', color: '#007bff' }}
+                                        onClick={handleEditAlbum}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </div>
+                    <div className="mt-4 mb-4"></div>
+                    <h4>Canciones</h4>
+                    <ul className="list-group">
+                        {songs.map((song, index) => (
+                            <li
+                                key={song.id}
+                                className={`list-group-item d-flex justify-content-between align-items-center ${currentSong && currentSong.id === song.id ? 'active' : ''}`}
+                                onClick={() => handleSongClick(song)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <div className="d-flex align-items-center">
+                                    <FontAwesomeIcon
+                                        icon={currentSong && currentSong.id === song.id && playing ? faPause : faPlay}
+                                        className="me-3"
+                                        style={{ color: currentSong && currentSong.id === song.id ? '#007bff' : '#6c757d' }}
+                                    />
+                                    <span>{index + 1}. </span>
+                                    <strong className="ms-2">{song.title}</strong>
+                                </div>
+                                <div className="d-flex align-items-center">
+                                    <span className="text-muted me-3">{song.duration ? `${song.duration} s` : 'No especificada'}</span>
+                                    {authUser === albumData.owner && (
+                                        <>
+                                            <FontAwesomeIcon
+                                                icon={faPen}
+                                                className="text-primary me-3"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEditSong(song);
+                                                }}
+                                            />
+                                            <FontAwesomeIcon
+                                                icon={faTrash}
+                                                className="text-danger"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteSong(song.id);
+                                                }}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+
+            {/* Modal para confirmar eliminación de canción */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres eliminar esta canción?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancelar</Button>
+                    <Button variant="danger" onClick={confirmDeleteSong}>Eliminar</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal para editar canción */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Editar Canción</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="formSongTitle">
+                            <Form.Label>Título</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editedSong?.title || ''}
+                                onChange={(e) => setEditedSong({ ...editedSong, title: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formSongYear" className="mt-3">
+                            <Form.Label>Año</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={editedSong?.year || ''}
+                                onChange={(e) => setEditedSong({ ...editedSong, year: e.target.value })}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
+                    <Button variant="primary" onClick={handleSaveSongChanges}>Guardar cambios</Button>
+                </Modal.Footer>
+            </Modal>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default AlbumDetail;

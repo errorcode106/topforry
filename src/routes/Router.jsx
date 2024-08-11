@@ -7,6 +7,8 @@ import Album from "../pages/Album";
 import ProtectedRoute from "./ProtectedRoute"; 
 import Profile from "../pages/Profile";
 import ErrorPage from "../pages/ErrorPage";
+import CreateAlbum from "../pages/CreateAlbum";
+
 
 import SongCreateForm from "../components/musicTop/SongCreateForm";
 import SongsList from "../components/musicTop/SongsList";
@@ -36,7 +38,15 @@ const Router = createBrowserRouter([
                 ),
             },
             {
-                path: "/album/:id",
+                path: "/albums/new",
+                element: (
+                    <ProtectedRoute>
+                        <CreateAlbum />
+                    </ProtectedRoute>
+                ),
+            },            
+            {
+                path: "/albums/id/:id",
                 element: (
                     <ProtectedRoute>
                         <Album />

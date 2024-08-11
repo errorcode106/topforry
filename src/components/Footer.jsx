@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter, faFacebook, faReddit, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
@@ -23,9 +24,9 @@ const Footer = ({
           <div className="col d-flex align-items-center">
             <nav className="nav">
               {menuItems.map((item, index) => (
-                <a key={index} className="nav-link text-white" href={item.href}>
+                <Link key={index} className="nav-link text-white" to={item.url}>
                   {item.text}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>
@@ -69,9 +70,9 @@ const Footer = ({
           <div className="col-auto text-end">
             <div className="social-icons mt-2">
               {socialLinks.map((link, index) => (
-                <a key={index} href={link.href} className="text-white me-2">
+                <Link key={index} to={link.href} className="text-white me-2">
                   <FontAwesomeIcon icon={link.icon} className="fs-3" />
-                </a>
+                </Link>
               ))}
             </div>
           </div>
