@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faFacebook, faReddit, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import './Footer.css';
 
 const Footer = ({
@@ -70,7 +69,7 @@ const Footer = ({
           <div className="col-auto text-end">
             <div className="social-icons mt-2">
               {socialLinks.map((link, index) => (
-                <Link key={index} to={link.href} className="text-white me-2">
+                <Link key={index} to={link.url} className="text-white me-2">
                   <FontAwesomeIcon icon={link.icon} className="fs-3" />
                 </Link>
               ))}
