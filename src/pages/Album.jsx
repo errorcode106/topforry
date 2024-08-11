@@ -65,7 +65,7 @@ const AlbumDetail = () => {
 
                 const songsData = await songsResponse.json();
                 setSongs(songsData.results);
-                setCurrentSong(songsData.results[0] || null); // Iniciar con la primera canción seleccionada o null si no hay canciones
+                setCurrentSong(songsData.results[0] || null);
 
                 setLoading(false);
             } catch (err) {
@@ -79,8 +79,8 @@ const AlbumDetail = () => {
 
     const handleSongClick = (song) => {
         setCurrentSong(song);
-        setPlaying(false);  // Parar la reproducción actual
-        setTimeout(() => setPlaying(true), 100);  // Iniciar la reproducción de la nueva canción
+        setPlaying(false);
+        setTimeout(() => setPlaying(true), 100);
     };
 
     const handleEditAlbum = () => {
@@ -182,7 +182,7 @@ const AlbumDetail = () => {
         const audioPlayer = document.getElementById('audio-player');
         if (audioPlayer) {
             if (playing && currentSong && currentSong.song_file) {
-                audioPlayer.currentTime = 0;  // Reinicia la canción
+                audioPlayer.currentTime = 0;
                 audioPlayer.play();
             } else {
                 audioPlayer.pause();
@@ -214,8 +214,8 @@ const AlbumDetail = () => {
             <div className="row">
                 <div className="col-md-4">
                     <AudioPlayer
-                        songFile={currentSong?.song_file || null}  // Asegurarse de pasar null si no hay canción
-                        coverImage={albumData.cover}
+                        songFile={currentSong?.song_file ? currentSong.song_file.replace("http://", "https://") : null}
+                        coverImage={albumData.cover ? albumData.cover.replace("http://", "https://") : null}
                         title={currentSong?.title || 'No song selected'}
                         artist={albumData.artist}
                         playing={playing}
