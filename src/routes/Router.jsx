@@ -3,12 +3,15 @@ import Login from "../pages/Login";
 import Layout from "./Layout";
 import Home from "../pages/Home";
 import Albums from "../pages/Albums";
+import Album from "../pages/Album";
 import ProtectedRoute from "./ProtectedRoute"; 
 import Profile from "../pages/Profile";
+import ErrorPage from "../pages/ErrorPage";
 
 const Router = createBrowserRouter([
     {
         element: <Layout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: "/login",
@@ -24,6 +27,14 @@ const Router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <Albums />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/album/:id",
+                element: (
+                    <ProtectedRoute>
+                        <Album />
                     </ProtectedRoute>
                 ),
             },
