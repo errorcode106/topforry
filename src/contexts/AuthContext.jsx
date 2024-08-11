@@ -38,7 +38,7 @@ function AuthProvider({ children }) {
 
     const actions = {
         login: (token) => {
-            dispatch({ type: ACTIONS.LOGIN, payload: token });
+            dispatch({ type: ACTIONS.LOGIN, payload: token, payload: username });
             localStorage.setItem("authToken", token);
             const origin = location.state?.from?.pathname || "/";
             navigate(origin);
@@ -46,6 +46,7 @@ function AuthProvider({ children }) {
         logout: () => {
             dispatch({ type: ACTIONS.LOGOUT });
             localStorage.removeItem("authToken")
+            localStorage.removeItem("username")
         },
     };
 
