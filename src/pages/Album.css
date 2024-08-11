@@ -1,0 +1,51 @@
+.album-cover {
+    border-radius: 15px;
+  }
+  
+  .custom-audio-player {
+    background-color: #1f1f1f;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .player-cover {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    margin-right: 15px;
+  }
+  
+  .player-info {
+    color: #fff;
+  }
+  
+  .player-info h5 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  .song-list .list-group-item {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+  }
+  
+  .song-list .list-group-item:hover,
+  .song-list .list-group-item.active {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .song-list .list-group-item .fa-play,
+  .song-list .list-group-item .fa-pause {
+    color: #007bff;
+    transition: color 0.3s;
+  }
+  
+  .song-list .list-group-item.active .fa-play,
+  .song-list .list-group-item.active .fa-pause {
+    color: #fff;
+  }
+  
