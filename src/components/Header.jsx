@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from '../assets/topforry.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './NavBar';
 import './Header.css';
@@ -38,7 +39,7 @@ const Header = ({ isLoggedIn, onLogout, title, subtitle, backgroundClass }) => {
         <div className="row align-items-center py-2" style={{ background: 'rgba(92, 88, 220, 0.75)', backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
           <div className="col">
             <Navbar
-              logoSrc="https://www.edesa.com.ar/wp-content/uploads/2023/11/Edesa-blanco.png"
+              logoSrc={Logo}
               logoAlt="Logo"
               navItems={navItems}
               buttonLinks={buttonLinks}

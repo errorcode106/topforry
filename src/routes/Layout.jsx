@@ -1,5 +1,8 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { AuthProvider } from "../contexts/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Logo from '../assets/topforry.svg';
+import { faTwitter, faFacebook, faReddit, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -49,7 +52,6 @@ export default function Layout() {
                         { text: 'Artistas', url: '/artists' },
                         { text: 'Géneros', url: '/genres' },
                         { text: 'Listas de Reproducción', url: '/playlists' },
-                        { text: 'API', url: 'https://sandbox.academiadevelopers.com/docs/' },
                     ]}
                     languages={[
                         { value: 'es', label: 'Español (AR)' },
@@ -57,15 +59,15 @@ export default function Layout() {
                     ]}
                     selectedLanguage="es"
                     onLanguageChange={(e) => console.log(e.target.value)}
-                    logoSrc="https://www.edesa.com.ar/wp-content/uploads/2023/11/Edesa-blanco.png"
+                    logoSrc={Logo}
                     siteName="Top Forry"
                     tagline="Sigue tu música!"
                     socialLinks={[
-                        { url: '#', icon: 'faTwitter' },
-                        { url: '#', icon: 'faFacebook' },
-                        { url: '#', icon: 'faReddit' },
-                        { url: '#', icon: 'faInstagram' },
-                        { url: '#', icon: 'faYoutube' },
+                        { url: '#', icon: faTwitter },
+                        { url: '#', icon: faFacebook },
+                        { url: '#', icon: faReddit },
+                        { url: '#', icon: faInstagram },
+                        { url: '#', icon: faYoutube },
                     ]}
                     year="2024"
                     copyrightText="Todas las marcas comerciales a las que se hace referencia son propiedad de sus respectivos dueños."
