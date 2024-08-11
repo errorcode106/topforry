@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AudioPlayer from '../components/AudioPlayer';
 
 const AlbumDetail = () => {
@@ -13,12 +13,26 @@ const AlbumDetail = () => {
     const [playing, setPlaying] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [editing, setEditing] = useState(false);
+    const [authUser, setAuthUser] = useState(null);
 
     useEffect(() => {
         const fetchAlbumData = async () => {
             try {
                 const authToken = localStorage.getItem('authToken');
 
+                // Fetch user info
+                const userResponse = await fetch(`https://sandbox.academiadevelopers.com/users/profiles/profile_data/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${authToken}`,
+                    },
+                });
+
+                const userData = await userResponse.json();
+                setAuthUser(userData.user__id);
+
+                // Fetch album data
                 const albumResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${id}/`, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -46,7 +60,7 @@ const AlbumDetail = () => {
 
                 const songsData = await songsResponse.json();
                 setSongs(songsData.results);
-                setCurrentSong(songsData.results[0]); // Iniciar con la primera canción seleccionada
+                setCurrentSong(songsData.results[0] || null); // Iniciar con la primera canción seleccionada o null si no hay canciones
 
                 setLoading(false);
             } catch (err) {
@@ -62,6 +76,32 @@ const AlbumDetail = () => {
         setCurrentSong(song);
         setPlaying(false);  // Parar la reproducción actual
         setTimeout(() => setPlaying(true), 100);  // Iniciar la reproducción de la nueva canción
+    };
+
+    const handleEditAlbum = () => {
+        setEditing(!editing);
+    };
+
+    const handleDeleteSong = async (songId) => {
+        const authToken = localStorage.getItem('authToken');
+
+        try {
+            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${songId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setSongs(songs.filter(song => song.id !== songId));
+            } else {
+                console.error('Error al eliminar la canción:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error al eliminar la canción:', error);
+        }
     };
 
     useEffect(() => {
@@ -99,22 +139,30 @@ const AlbumDetail = () => {
         <div className="container my-5">
             <div className="row">
                 <div className="col-md-4">
-                    {currentSong && (
-                        <AudioPlayer
-                            songFile={currentSong?.song_file}
-                            coverImage={albumData.cover}
-                            title={currentSong?.title}
-                            artist={albumData.artist}
-                            playing={playing}
-                            setPlaying={setPlaying}
-                        />
-                    )}
+                    <AudioPlayer
+                        songFile={currentSong?.song_file || null}  // Asegurarse de pasar null si no hay canción
+                        coverImage={albumData.cover}
+                        title={currentSong?.title || 'No song selected'}
+                        artist={albumData.artist}
+                        playing={playing}
+                        setPlaying={setPlaying}
+                    />
                     <div>
                         <p></p>
                     </div>
                 </div>
                 <div className="col-md-8">
-                    <h2>{albumData.title} <span className="text-muted">#{albumData.year}:{albumData.owner}</span></h2>
+                    <div className="d-flex align-items-center">
+                        <h2>{albumData.title} <span className="text-muted">#{albumData.year}:{albumData.owner}</span></h2>
+                        {authUser === albumData.owner && (
+                            <FontAwesomeIcon
+                                icon={faPen}
+                                className="ms-auto"
+                                style={{ cursor: 'pointer', color: '#007bff' }}
+                                onClick={handleEditAlbum}
+                            />
+                        )}
+                    </div>
                     <div className="mt-4 mb-4">
 
                     </div>
@@ -136,7 +184,20 @@ const AlbumDetail = () => {
                                     <span>{index + 1}. </span>
                                     <strong className="ms-2">{song.title}</strong>
                                 </div>
-                                <span className="text-muted">{song.duration ? `${song.duration} s` : 'No especificada'}</span>
+                                <div className="d-flex align-items-center">
+                                    <span className="text-muted me-3">{song.duration ? `${song.duration} s` : 'No especificada'}</span>
+                                    {authUser === albumData.owner && (
+                                        <FontAwesomeIcon
+                                            icon={faTrash}
+                                            className="text-danger"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteSong(song.id);
+                                            }}
+                                        />
+                                    )}
+                                </div>
                             </li>
                         ))}
                     </ul>

@@ -55,6 +55,6 @@
 .music-card:hover {
   background-color: rgba(71, 67, 216, 1);
   transition: background-color 0.2s, color 0.3s;
-  color: white;
+  color: white !important;
 }
 

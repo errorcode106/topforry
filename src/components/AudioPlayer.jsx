@@ -12,14 +12,14 @@ const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying 
   const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && songFile) {
       if (playing) {
         audioRef.current.play();
       } else {
         audioRef.current.pause();
       }
     }
-  }, [playing]);
+  }, [playing, songFile]);
 
   const handlePlayPause = () => {
     setPlaying(!playing);
@@ -48,7 +48,7 @@ const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying 
   };
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && songFile) {
       audioRef.current.onloadedmetadata = () => {
         setDuration(audioRef.current.duration);
       };
@@ -60,6 +60,17 @@ const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying 
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
+
+  // Verificar si hay un archivo de canción
+  if (!songFile) {
+    return (
+      <div className="audio-player">
+        <div className="cover">
+          <img src={coverImage} alt="Cover" className="img-fluid rounded" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="audio-player">

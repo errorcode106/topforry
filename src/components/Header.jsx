@@ -17,10 +17,19 @@ const Header = ({ isLoggedIn, onLogout, title, subtitle, backgroundClass }) => {
         { text: 'Géneros', href: '#' },
       ],
     },
+    {
+      text: 'Álbunes',
+      dropdown: true,
+      requiresAuth: true,
+      dropdownItems: [
+        { text: 'Ver Listado', href: '/albums' },
+        { text: 'Crear uno Nuevo', href: '/albums/new' },
+      ],
+    },
   ];
 
   const buttonLinks = [
-    { text: 'Lista de Reproducción', href: '#', className: 'btn-dark', requiresAuth: true },
+    { text: 'Mi Perfil', href: '/profile', className: 'btn-dark', requiresAuth: true },
   ];
 
   return (
