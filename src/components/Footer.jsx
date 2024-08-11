@@ -17,7 +17,7 @@ const Footer = ({
   copyrightText,
 }) => {
   return (
-    <footer className="footer text-white py-4" style={{ backgroundColor: '#5C58DC' }}>
+    <footer className="footer text-white py-4" style={{ backgroundColor: '#4341B2' }}>
       <div className="container">
         <div className="row border-bottom pb-3">
           <div className="col d-flex align-items-center">

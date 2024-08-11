@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './NavBar';
 import './Header.css';
 
-const Header = ({ isLoggedIn, onLogout }) => {
+const Header = ({ isLoggedIn, onLogout, title, subtitle, backgroundClass }) => {
   const navItems = [
     { text: 'Inicio', href: '/' },
     {
@@ -11,8 +11,8 @@ const Header = ({ isLoggedIn, onLogout }) => {
       dropdown: true,
       requiresAuth: true,
       dropdownItems: [
-        { text: 'Álbumes', href: '/albunes' },
-        { text: 'Canciones', href: '#' },
+        { text: 'Álbumes', href: '/albums' },
+        { text: 'Canciones', href: '/songs' },
         { text: 'Artistas', href: '#' },
         { text: 'Géneros', href: '#' },
       ],
@@ -24,7 +24,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
   ];
 
   return (
-    <header className="masthead position-relative">
+    <header className={`masthead position-relative ${backgroundClass}`}>
       <div className="container-fluid fixed-top">
         <div className="row align-items-center py-2" style={{ background: 'rgba(92, 88, 220, 0.75)', backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
           <div className="col">
@@ -41,9 +41,9 @@ const Header = ({ isLoggedIn, onLogout }) => {
       </div>
       <div className="overlay-header"></div>
       <div className="container-fluid d-flex justify-content-center align-items-center h-100">
-        <div className="masthead-text">
-          <h1>Álbumes</h1>
-          <p className="fs-4">Aquí encontrarás la lista de todos los álbumes.</p>
+        <div className="masthead-text text-center">
+          <h1>{title}</h1>
+          <p className="fs-4">{subtitle}</p>
         </div>
       </div>
     </header>

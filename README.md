@@ -10,6 +10,7 @@ Currently, two official plugins are available:
 `npm create vite@latest`
 `npm install` or `npm i`
 `npm run dev`
+
 git clone -b dante https://fgmc125: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@github.com/errorcode106/TopForry.git
 
 npm install @fortawesome/react-fontawesome @fortawesome/free-brands-svg-icons
