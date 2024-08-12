@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPen, faTrash, faSave, faTimesCircle, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button, Form } from 'react-bootstrap';
 import AudioPlayer from '../components/AudioPlayer';
 
 const AlbumDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [albumData, setAlbumData] = useState(null);
     const [songs, setSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
@@ -20,13 +21,15 @@ const AlbumDetail = () => {
     const [songToDelete, setSongToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editedSong, setEditedSong] = useState(null);
+    const [tempCoverImage, setTempCoverImage] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showDeleteAlbumModal, setShowDeleteAlbumModal] = useState(false);
 
     useEffect(() => {
         const fetchAlbumData = async () => {
             try {
                 const authToken = localStorage.getItem('authToken');
 
-                // Fetch user info
                 const userResponse = await fetch(`https://sandbox.academiadevelopers.com/users/profiles/profile_data/`, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -37,7 +40,6 @@ const AlbumDetail = () => {
                 const userData = await userResponse.json();
                 setAuthUser(userData.user__id);
 
-                // Fetch album data
                 const albumResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${id}/`, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -88,13 +90,14 @@ const AlbumDetail = () => {
     };
 
     const handleSaveAlbumChanges = async () => {
+        setIsSaving(true);
         const authToken = localStorage.getItem('authToken');
         const formData = new FormData();
         formData.append('title', albumData.title);
         formData.append('year', albumData.year);
         formData.append('artist', albumData.artist);
-        if (albumData.cover instanceof File) {
-            formData.append('cover', albumData.cover);
+        if (tempCoverImage instanceof File) {
+            formData.append('cover', tempCoverImage);
         }
 
         try {
@@ -112,9 +115,12 @@ const AlbumDetail = () => {
 
             const updatedAlbum = await response.json();
             setAlbumData(updatedAlbum);
+            setTempCoverImage(null);
             setEditing(false);
         } catch (err) {
             console.error('Error al actualizar el álbum:', err);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -143,6 +149,33 @@ const AlbumDetail = () => {
             }
         } catch (error) {
             console.error('Error al eliminar la canción:', error);
+        }
+    };
+
+    const handleDeleteAlbum = () => {
+        setShowDeleteAlbumModal(true);
+    };
+
+    const confirmDeleteAlbum = async () => {
+        const authToken = localStorage.getItem('authToken');
+
+        try {
+            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/albums/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setShowDeleteAlbumModal(false);
+                navigate('/albums');
+            } else {
+                console.error('Error al eliminar el álbum:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error al eliminar el álbum:', error);
         }
     };
 
@@ -176,6 +209,16 @@ const AlbumDetail = () => {
         } catch (err) {
             console.error('Error al actualizar la canción:', err);
         }
+    };
+
+    const handleCoverImageChange = (file, previewUrl) => {
+        setTempCoverImage(file);
+        setAlbumData({ ...albumData, cover: previewUrl });
+    };
+
+    const handleCancelEdit = () => {
+        setEditing(false);
+        setTempCoverImage(null);
     };
 
     useEffect(() => {
@@ -220,6 +263,8 @@ const AlbumDetail = () => {
                         artist={albumData.artist}
                         playing={playing}
                         setPlaying={setPlaying}
+                        isEditable={editing}
+                        onCoverImageChange={handleCoverImageChange}
                     />
                 </div>
                 <div className="col-md-8">
@@ -238,12 +283,27 @@ const AlbumDetail = () => {
                                     value={albumData.year}
                                     onChange={(e) => setAlbumData({ ...albumData, year: e.target.value })}
                                 />
-                                <input
-                                    type="file"
-                                    className="form-control ms-2"
-                                    onChange={(e) => setAlbumData({ ...albumData, cover: e.target.files[0] })}
+                                <FontAwesomeIcon
+                                    icon={faSave}
+                                    className="ms-2"
+                                    size="lg"
+                                    style={{ cursor: isSaving ? 'not-allowed' : 'pointer', color: isSaving ? '#ccc' : '#007bff' }}
+                                    onClick={isSaving ? null : handleSaveAlbumChanges}
                                 />
-                                <Button className="ms-2" onClick={handleSaveAlbumChanges}>Guardar</Button>
+                                <FontAwesomeIcon
+                                    icon={faTimesCircle}
+                                    className="ms-2"
+                                    size="lg"
+                                    style={{ cursor: isSaving ? 'not-allowed' : 'pointer', color: isSaving ? '#ccc' : '#dc3545' }}
+                                    onClick={isSaving ? null : handleCancelEdit}
+                                />
+                                <FontAwesomeIcon
+                                    icon={faExclamationTriangle}
+                                    className="ms-2"
+                                    size="lg"
+                                    style={{ cursor: isSaving ? 'not-allowed' : 'pointer', color: isSaving ? '#ccc' : '#dc3545' }}
+                                    onClick={isSaving ? null : handleDeleteAlbum}
+                                />
                             </>
                         ) : (
                             <>
@@ -252,6 +312,7 @@ const AlbumDetail = () => {
                                     <FontAwesomeIcon
                                         icon={faPen}
                                         className="ms-auto"
+                                        size="lg"
                                         style={{ cursor: 'pointer', color: '#007bff' }}
                                         onClick={handleEditAlbum}
                                     />
@@ -280,7 +341,7 @@ const AlbumDetail = () => {
                                 </div>
                                 <div className="d-flex align-items-center">
                                     <span className="text-muted me-3">{song.duration ? `${song.duration} s` : 'No especificada'}</span>
-                                    {authUser === albumData.owner && (
+                                    {authUser === albumData.owner && editing && (
                                         <>
                                             <FontAwesomeIcon
                                                 icon={faPen}
@@ -309,7 +370,6 @@ const AlbumDetail = () => {
                 </div>
             </div>
 
-            {/* Modal para confirmar eliminación de canción */}
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar eliminación</Modal.Title>
@@ -323,7 +383,19 @@ const AlbumDetail = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Modal para editar canción */}
+            <Modal show={showDeleteAlbumModal} onHide={() => setShowDeleteAlbumModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar eliminación del álbum</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres eliminar este álbum y todas sus canciones?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteAlbumModal(false)}>Cancelar</Button>
+                    <Button variant="danger" onClick={confirmDeleteAlbum}>Eliminar Álbum</Button>
+                </Modal.Footer>
+            </Modal>
+
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Editar Canción</Modal.Title>
