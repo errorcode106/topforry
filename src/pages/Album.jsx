@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faPen, faTrash, faSave, faTimesCircle, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faPen, faTrash, faSave, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button, Form } from 'react-bootstrap';
 import AudioPlayer from '../components/AudioPlayer';
+import SongManager from '../components/SongManager';
 
 const AlbumDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [albumData, setAlbumData] = useState(null);
+    const [originalAlbumData, setOriginalAlbumData] = useState(null);
     const [songs, setSongs] = useState([]);
+    const [originalSongs, setOriginalSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
     const [playing, setPlaying] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -24,6 +27,8 @@ const AlbumDetail = () => {
     const [tempCoverImage, setTempCoverImage] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [showDeleteAlbumModal, setShowDeleteAlbumModal] = useState(false);
+    const [newSongs, setNewSongs] = useState([]);
+    const [songsToDelete, setSongsToDelete] = useState([]);
 
     useEffect(() => {
         const fetchAlbumData = async () => {
@@ -53,6 +58,7 @@ const AlbumDetail = () => {
 
                 const album = await albumResponse.json();
                 setAlbumData(album);
+                setOriginalAlbumData(album);
 
                 const songsResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/?album=${id}`, {
                     headers: {
@@ -67,6 +73,7 @@ const AlbumDetail = () => {
 
                 const songsData = await songsResponse.json();
                 setSongs(songsData.results);
+                setOriginalSongs(songsData.results);
                 setCurrentSong(songsData.results[0] || null);
 
                 setLoading(false);
@@ -86,6 +93,10 @@ const AlbumDetail = () => {
     };
 
     const handleEditAlbum = () => {
+        if (!editing) {
+            setOriginalAlbumData(albumData);
+            setOriginalSongs([...songs]);
+        }
         setEditing(!editing);
     };
 
@@ -113,10 +124,60 @@ const AlbumDetail = () => {
                 throw new Error('Error al actualizar el álbum.');
             }
 
+            await Promise.all(newSongs.map(async (song) => {
+                const songFormData = new FormData();
+                songFormData.append('title', song.title);
+                songFormData.append('year', song.year);
+                songFormData.append('album', albumData.id);
+                songFormData.append('song_file', song.songFile);
+
+                const songResponse = await fetch('https://sandbox.academiadevelopers.com/harmonyhub/songs/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Token ${authToken}`,
+                    },
+                    body: songFormData,
+                });
+
+                if (!songResponse.ok) {
+                    throw new Error('Error al añadir la canción.');
+                }
+            }));
+
+            await Promise.all(songsToDelete.map(async (songId) => {
+                const deleteResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${songId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Token ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!deleteResponse.ok) {
+                    console.error('Error al eliminar la canción:', deleteResponse.statusText);
+                }
+            }));
+
+            const updatedSongsResponse = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/?album=${albumData.id}`, {
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!updatedSongsResponse.ok) {
+                throw new Error('Error al obtener las canciones actualizadas.');
+            }
+
+            const updatedSongsData = await updatedSongsResponse.json();
+            setSongs(updatedSongsData.results);
+
             const updatedAlbum = await response.json();
             setAlbumData(updatedAlbum);
             setTempCoverImage(null);
             setEditing(false);
+            setNewSongs([]);
+            setSongsToDelete([]);
         } catch (err) {
             console.error('Error al actualizar el álbum:', err);
         } finally {
@@ -125,31 +186,10 @@ const AlbumDetail = () => {
     };
 
     const handleDeleteSong = (songId) => {
-        setSongToDelete(songId);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDeleteSong = async () => {
-        const authToken = localStorage.getItem('authToken');
-
-        try {
-            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${songToDelete}/`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Token ${authToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                setSongs(songs.filter(song => song.id !== songToDelete));
-                setShowDeleteModal(false);
-            } else {
-                console.error('Error al eliminar la canción:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Error al eliminar la canción:', error);
-        }
+        setSongs(songs.filter(song => song.id !== songId));
+        setSongsToDelete([...songsToDelete, songId]);
+        setSongToDelete(null);
+        setShowDeleteModal(false);
     };
 
     const handleDeleteAlbum = () => {
@@ -184,31 +224,9 @@ const AlbumDetail = () => {
         setShowEditModal(true);
     };
 
-    const handleSaveSongChanges = async () => {
-        const authToken = localStorage.getItem('authToken');
-        const formData = new FormData();
-        formData.append('title', editedSong.title);
-        formData.append('year', editedSong.year);
-
-        try {
-            const response = await fetch(`https://sandbox.academiadevelopers.com/harmonyhub/songs/${editedSong.id}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Token ${authToken}`,
-                },
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al actualizar la canción.');
-            }
-
-            const updatedSong = await response.json();
-            setSongs(songs.map(song => song.id === updatedSong.id ? updatedSong : song));
-            setShowEditModal(false);
-        } catch (err) {
-            console.error('Error al actualizar la canción:', err);
-        }
+    const handleSaveSongChanges = () => {
+        setSongs(songs.map(song => song.id === editedSong.id ? editedSong : song));
+        setShowEditModal(false);
     };
 
     const handleCoverImageChange = (file, previewUrl) => {
@@ -217,8 +235,12 @@ const AlbumDetail = () => {
     };
 
     const handleCancelEdit = () => {
-        setEditing(false);
+        setAlbumData(originalAlbumData);
+        setSongs(originalSongs);
+        setNewSongs([]);
+        setSongsToDelete([]);
         setTempCoverImage(null);
+        setEditing(false);
     };
 
     useEffect(() => {
@@ -298,12 +320,13 @@ const AlbumDetail = () => {
                                     onClick={isSaving ? null : handleCancelEdit}
                                 />
                                 <FontAwesomeIcon
-                                    icon={faExclamationTriangle}
+                                    icon={faTrash}
                                     className="ms-2"
                                     size="lg"
                                     style={{ cursor: isSaving ? 'not-allowed' : 'pointer', color: isSaving ? '#ccc' : '#dc3545' }}
                                     onClick={isSaving ? null : handleDeleteAlbum}
                                 />
+
                             </>
                         ) : (
                             <>
@@ -358,7 +381,8 @@ const AlbumDetail = () => {
                                                 style={{ cursor: 'pointer' }}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleDeleteSong(song.id);
+                                                    setSongToDelete(song.id);
+                                                    setShowDeleteModal(true);
                                                 }}
                                             />
                                         </>
@@ -367,6 +391,13 @@ const AlbumDetail = () => {
                             </li>
                         ))}
                     </ul>
+
+                    {editing && (
+                        <div className="mt-4">
+                            <h4>Añadir Nuevas Canciones</h4>
+                            <SongManager songs={newSongs} setSongs={setNewSongs} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -379,7 +410,7 @@ const AlbumDetail = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancelar</Button>
-                    <Button variant="danger" onClick={confirmDeleteSong}>Eliminar</Button>
+                    <Button variant="danger" onClick={() => handleDeleteSong(songToDelete)}>Eliminar</Button>
                 </Modal.Footer>
             </Modal>
 
