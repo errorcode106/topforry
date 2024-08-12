@@ -9,7 +9,7 @@
   margin: 0 auto;
 }
 
-.cover img {
+.audio-player .cover img {
   width: 100%;
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -89,4 +89,37 @@
   opacity: 0;
   height: 0;
   overflow: hidden;
+}
+
+.cover-img-wrapper {
+  position: relative;
+}
+
+.cover-img-wrapper.editable:hover {
+  cursor: pointer;
+}
+
+.overlay-audio-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 15px;
+}
+
+.cover-img-wrapper.editable:hover .overlay-audio-player {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.edit-button {
+  color: white;
+  font-size: 2rem;
 }

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faStepBackward, faStepForward, faVolumeUp, faRedoAlt, faRandom } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faStepBackward, faStepForward, faVolumeUp, faRedoAlt, faRandom, faPen } from '@fortawesome/free-solid-svg-icons';
 import './AudioPlayer.css';
 
-const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying }) => {
+const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying, isEditable, onCoverImageChange }) => {
   const audioRef = useRef(null);
   const progressRef = useRef(null);
   const volumeRef = useRef(null);
@@ -61,12 +61,37 @@ const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying 
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  const triggerFileInput = () => {
+    document.getElementById('coverInput').click();
+  };
+
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onCoverImageChange(file, reader.result); // Notifica al padre del cambio de imagen
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Verificar si hay un archivo de canción
   if (!songFile) {
     return (
       <div className="audio-player">
         <div className="cover">
-          <img src={coverImage} alt="Cover" className="img-fluid rounded" />
+          <div className={`cover-img-wrapper ${isEditable ? 'editable' : ''}`}>
+            <img src={coverImage} alt="Cover" className="img-fluid rounded" onClick={isEditable ? triggerFileInput : undefined} />
+            {isEditable && (
+              <div className="overlay-audio-player" onClick={triggerFileInput}>
+                <div className="edit-button">
+                  <FontAwesomeIcon icon={faPen} />
+                </div>
+              </div>
+            )}
+            <input type="file" id="coverInput" style={{ display: 'none' }} onChange={handleCoverChange} />
+          </div>
         </div>
       </div>
     );
@@ -75,7 +100,17 @@ const AudioPlayer = ({ songFile, coverImage, title, artist, playing, setPlaying 
   return (
     <div className="audio-player">
       <div className="cover">
-        <img src={coverImage} alt={title} />
+        <div className={`cover-img-wrapper ${isEditable ? 'editable' : ''}`}>
+          <img src={coverImage} alt={title} onClick={isEditable ? triggerFileInput : undefined} />
+          {isEditable && (
+            <div className="overlay-audio-player" onClick={triggerFileInput}>
+              <div className="edit-button">
+                <FontAwesomeIcon icon={faPen} />
+              </div>
+            </div>
+          )}
+          <input type="file" id="coverInput" style={{ display: 'none' }} onChange={handleCoverChange} />
+        </div>
       </div>
       <div className="info">
         <h4>{title}</h4>
